@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  ExpenseApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: com.aws.expenses.handler.ExpenseLambdaHandler::handleRequest
+      Runtime: java17
+      CodeUri: .
+      MemorySize: 1024
+      Timeout: 30
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /expenses/{proxy+}
+            Method: ANY
+
+  ExpenseTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Expenses
+      AttributeDefinitions:
+        - AttributeName: expenseId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: expenseId
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
