@@ -12,19 +12,20 @@ import com.aws.expensetracker.ExpenseApplication;
 
 
 public class ExpenseLambdaHandler implements RequestHandler<AwsProxyRequest, AwsProxyResponse> {
-    private SpringBootLambdaContainerHandler<AwsProxyRequest, AwsProxyResponse> handler;
 
-    public ExpenseLambdaHandler() throws ContainerInitializationException {
-        handler = (SpringBootLambdaContainerHandler<AwsProxyRequest, AwsProxyResponse>)
-                new SpringBootProxyHandlerBuilder()
-                        .springBootApplication(ExpenseApplication.class)
-                        .asyncInit()
-                        .buildAndInitialize();
+    private static final SpringBootLambdaContainerHandler<AwsProxyRequest, AwsProxyResponse> handler;
+
+    static {
+        try {
+            handler = SpringBootLambdaContainerHandler.getAwsProxyHandler(ExpenseApplication.class);
+        } catch (ContainerInitializationException e) {
+            // If we fail here, Lambda won't be able to process the request at all
+            throw new RuntimeException("Could not initialize Spring Boot application", e);
+        }
     }
 
     @Override
-    public AwsProxyResponse handleRequest(AwsProxyRequest input, Context context) {
-        return handler.proxy(input, context);
+    public AwsProxyResponse handleRequest(AwsProxyRequest awsProxyRequest, Context context) {
+        return handler.proxy(awsProxyRequest, context);
     }
 }
-

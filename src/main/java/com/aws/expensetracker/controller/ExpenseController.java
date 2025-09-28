@@ -14,23 +14,23 @@ public class ExpenseController {
     @Autowired
     private ExpenseService service;
 
-    @GetMapping
+    @GetMapping("/getAllExpenses")
     public List<Expense> getAllExpenses() {
         return service.findAll();
     }
 
-    @PostMapping
+    @PostMapping("/addExpense")
     public ResponseEntity<String> addExpense(@RequestBody Expense expense) {
         service.save(expense);
         return ResponseEntity.ok("Expense saved.");
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/getExpenseForId/{id}")
     public Expense getExpense(@PathVariable String id) {
         return service.findById(id);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/deleteExpenseForId/{id}")
     public ResponseEntity<String> deleteExpense(@PathVariable String id) {
         service.delete(id);
         return ResponseEntity.ok("Expense deleted.");
