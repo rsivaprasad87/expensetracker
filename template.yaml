@@ -1,0 +1,62 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Spring Boot Expense Tracker with Lambda, API Gateway, and DynamoDB
+
+Globals:
+  Function:
+    Timeout: 90
+    Runtime: java17
+    MemorySize: 1024
+
+Resources:
+
+  ExpenseApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: ExpenseApi
+      StageName: Prod
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+
+  ExpenseApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: ExpenseApiFunction
+      Handler: com.aws.expensetracker.handler.ExpenseLambdaHandler::handleRequest
+      CodeUri: .
+      Events:
+        ExpensesApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ExpenseApi
+            Path: /expenses/{proxy+}
+            Method: ANY
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ExpenseTable
+      Environment:
+        Variables:
+          SPRING_PROFILES_ACTIVE: aws   # 👈 ensures Lambda runs with aws profile -use "local" to run locally
+  ExpenseTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Expenses
+      AttributeDefinitions:
+        - AttributeName: expenseId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: expenseId
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+Outputs:
+  ApiUrl:
+    Description: "Invoke URL for the Expense API"
+    Value: !Sub "https://${ExpenseApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/expenses"
+  LambdaFunctionArn:
+    Description: "ARN of the Expense Lambda Function"
+    Value: !GetAtt ExpenseApiFunction.Arn
+  DynamoDBTableName:
+    Description: "Name of the DynamoDB Expenses table"
+    Value: !Ref ExpenseTable
