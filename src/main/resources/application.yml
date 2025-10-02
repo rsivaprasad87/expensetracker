@@ -3,3 +3,21 @@ spring:
     web-application-type: servlet
   application:
     name: expensetracker
+  profiles:
+    default: local
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+---
+spring:
+  config:
+    activate:
+      on-profile: aws
+
+logging:
+  level:
+    software:
+      amazon:
+        awssdk: DEBUG

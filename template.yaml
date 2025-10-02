@@ -4,7 +4,7 @@ Description: Spring Boot Expense Tracker with Lambda, API Gateway, and DynamoDB
 
 Globals:
   Function:
-    Timeout: 30
+    Timeout: 90
     Runtime: java17
     MemorySize: 1024
 
@@ -36,6 +36,9 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref ExpenseTable
+      Environment:
+        Variables:
+          SPRING_PROFILES_ACTIVE: aws   # 👈 ensures Lambda runs with aws profile -use "local" to run locally
   ExpenseTable:
     Type: AWS::DynamoDB::Table
     Properties:
