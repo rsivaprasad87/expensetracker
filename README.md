@@ -119,11 +119,12 @@ sam build
 sam deploy --> This will provide the API Gateway point as output 
 ```
 
-4. Test Endpoints:
+4.Test Endpoints:
+```bash
 https://<api-id>.execute-api.<region>.amazonaws.com/Prod/expenses/addExpense --> POST method
 https://<api-id>.execute-api.<region>.amazonaws.com/Prod/expenses/getAllExpenses --> Get endpoint
+```
 ---
-
 ## Common Errors & Fixes
 
 | Error | Cause | Fix                                                                                                                                                                                  |
@@ -142,11 +143,12 @@ https://<api-id>.execute-api.<region>.amazonaws.com/Prod/expenses/getAllExpenses
 - **Local development** uses Spring profile `local` → connects to DynamoDB Local.
 - **AWS deployment** uses Spring profile `aws` → connects to AWS DynamoDB.
 - SAM Local runs in Docker → must use `host.docker.internal` to reach DynamoDB on host machine.
-  **Useful commands**
+
+## Useful Commands
+
 - aws dynamodb delete-table --table-name table-name --endpoint-url http://host.docker.internal:8000
 - aws dynamodb scan --table-name Expenses --endpoint-url http://host.docker.internal:8000 --output json
-- # Clean SAM
-rm -rf .aws-sam
--aws cloudformation rollback-stack --stack-name ExpenseTrackerStack
--aws cloudformation describe-stack-events --stack-name ExpenseTrackerStack --output table
--aws cloudformation delete-stack --stack-name ExpenseTrackerStack
+- rm -rf .aws-sam --> To clean local SAM directory
+- aws cloudformation rollback-stack --stack-name ExpenseTrackerStack
+- aws cloudformation describe-stack-events --stack-name ExpenseTrackerStack --output table
+- aws cloudformation delete-stack --stack-name ExpenseTrackerStack
